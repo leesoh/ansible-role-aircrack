@@ -1,0 +1,59 @@
+---
+- set_fact:
+    ansible_distro: "{{ ansible_distribution|lower|replace(' ', '_')|replace('/', '-') }}"
+
+- name: Gather OS-specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+      - "{{ ansible_distro }}-{{ansible_distribution_version|lower|replace('/', '_') }}.yml"
+      - "{{ ansible_distro }}-{{ ansible_distribution_release }}.yml"
+      - "{{ ansible_distro }}-{{ansible_distribution_major_version|lower|replace('/', '_') }}.yml"
+      - "{{ ansible_distro }}.yml"
+      - "{{ ansible_os_family|lower }}.yml"
+
+- name: Install dependencies
+  become: true
+  with_items: "{{ aircrack_packages }}"
+  package:
+    name: "{{ item }}"
+
+- name: Clone repository
+  become: true
+  git:
+    repo: https://github.com/aircrack-ng/aircrack-ng
+    dest: "{{ aircrack_git_location }}/aircrack-ng"
+    update: yes
+  register: aircrack
+
+- name: Autoreconf
+  become: true
+  command: autoreconf -i
+  when: aircrack.changed
+  args:
+    chdir: "{{ aircrack_git_location }}/aircrack-ng"
+
+- name: Run "configure" for Aircrack-ng
+  become: true
+  when: aircrack.changed
+  command: ./configure
+  args:
+    chdir: "{{ aircrack_git_location }}/aircrack-ng"
+
+- name: Run "make" for Aircrack-ng
+  become: true
+  when: aircrack.changed
+  make:
+    chdir: "{{ aircrack_git_location }}/aircrack-ng"
+
+- name: Run "make install" for Aircrack-ng
+  become: true
+  when: aircrack.changed
+  make:
+    target: install
+    chdir: "{{ aircrack_git_location }}/aircrack-ng"
+
+- name: Run "ldconfig"
+  become: true
+  when: aircrack.changed
+  command: ldconfig

@@ -1,0 +1,20 @@
+---
+aircrack_git_location: "/opt"
+aircrack_packages:
+  - autoconf
+  - automake
+  - build-essential
+  - ethtool
+  - libcmocka-dev
+  - libhwloc-dev
+  - libnl-3-dev
+  - libnl-genl-3-dev
+  - libpcap-dev
+  - libpcre3-dev
+  - libsqlite3-dev
+  - libssl-dev
+  - libtool
+  - pkg-config
+  - rfkill
+  - shtool
+  - zlib1g-dev
