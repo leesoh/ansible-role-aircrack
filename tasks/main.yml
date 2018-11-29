@@ -14,9 +14,8 @@
 
 - name: Install dependencies
   become: true
-  with_items: "{{ aircrack_packages }}"
   package:
-    name: "{{ item }}"
+    name: "{{ aircrack_packages }}"
 
 - name: Clone repository
   become: true
