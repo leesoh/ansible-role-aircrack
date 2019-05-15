@@ -12,11 +12,6 @@
       - "{{ ansible_distro }}.yml"
       - "{{ ansible_os_family|lower }}.yml"
 
-- name: Install dependencies
-  become: true
-  package:
-    name: "{{ aircrack_packages }}"
-
 - name: Clone repository
   become: true
   git:
@@ -24,6 +19,12 @@
     dest: "{{ aircrack_git_location }}/aircrack-ng"
     update: yes
   register: aircrack
+
+- name: Install dependencies
+  become: true
+  when: aircrack.changed
+  package:
+    name: "{{ aircrack_packages }}"
 
 - name: Autoreconf
   become: true
